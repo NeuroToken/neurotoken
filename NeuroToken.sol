@@ -181,7 +181,7 @@ contract MyAdvancedToken is owned, token {
     }
 
     /// @notice Buy tokens from contract by sending ether
-    function buy() payable {
+    function () payable {
         uint amount = msg.value / buyPrice; // calculates the amount
         _transfer(this, msg.sender, amount); // makes the transfers
     }
@@ -220,5 +220,11 @@ contract NeuroToken is MyAdvancedToken {
 
         frozenTokensSupply -= releasedAmount;
         balanceOf[address(this)] += releasedAmount;
+    }
+
+    // Withdraw the funds
+    function safeWithdrawal(address target, uint256 amount) onlyOwner {
+        require(this.balance >= amount); // checks if the contract has enough ether to withdraw
+        target.transfer(amount); // sends ether to the target. It's important to do this last to avoid recursion attacks
     }
 }
